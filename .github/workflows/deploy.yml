@@ -8,25 +8,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          cat >>~/.ssh/config <<END
-          Host ec2
-            HostName ${{ secrets.EC2_HOST }}
-            User ubuntu
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-          END
-
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "cd /home/ubuntu/cloud-ecommerce-api && \
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_HOST }} "cd /home/ubuntu/cloud-ecommerce-api && \
           git pull && \
           echo 'API_KEY=${{ secrets.PROD_API_KEY }}' > .env && \
           docker-compose down && \
