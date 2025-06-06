@@ -12,6 +12,7 @@ The solution implements two main components from the requirements:
 - **AWS EC2**: For hosting the application
 - **Docker**: For containerization of the API and database
 - **MongoDB**: As the database service
+- **GitHub Actions**: For automated deployment
 
 ## Features
 
@@ -21,6 +22,7 @@ The solution implements two main components from the requirements:
   - DELETE /products/{id} - Delete a product
 - Docker containerization for easy deployment
 - MongoDB integration for data persistence
+- Automated deployment using GitHub Actions
 
 ## Prerequisites
 
@@ -67,11 +69,24 @@ curl -X DELETE http://localhost:5000/products/{product_id}
 
 ## Deployment
 
+### Manual Deployment
 The application is deployed on AWS EC2 using Docker containers. The deployment process includes:
 1. Setting up an EC2 instance
 2. Installing Docker and Docker Compose
 3. Cloning the repository
 4. Running the application with docker-compose
+
+### Automated Deployment
+The project uses GitHub Actions for automated deployment:
+1. When code is pushed to the main branch, GitHub Actions automatically:
+   - Connects to the EC2 instance via SSH
+   - Pulls the latest code
+   - Restarts the Docker containers
+
+To set up automated deployment:
+1. Add the following secrets to your GitHub repository:
+   - `EC2_SSH_KEY`: Your EC2 instance's private SSH key
+   - `EC2_HOST`: Your EC2 instance's public IP address
 
 ## Future Improvements
 
