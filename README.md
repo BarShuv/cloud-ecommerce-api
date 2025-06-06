@@ -23,6 +23,7 @@ The solution implements two main components from the requirements:
 - Docker containerization for easy deployment
 - MongoDB integration for data persistence
 - Automated deployment using GitHub Actions
+- Zero-downtime deployments with Docker Compose
 
 ## Prerequisites
 
