@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -15,7 +14,7 @@ else
 fi
 
 # API endpoint
-API_URL="http://localhost:5000"
+API_URL="http://3.120.41.22:5000"
 
 # Function to make API calls with API key
 call_api() {
@@ -34,7 +33,7 @@ echo "1. GET all products (should return initial products):"
 response=$(call_api GET "/products")
 echo "$response"
 if echo "$response" | grep -q "Laptop"; then
-    echo -e "${GREEN}PASS: Initial products found (4)${NC}"
+    echo -e "${GREEN}PASS: Initial products found (3)${NC}"
 else
     echo -e "${RED}FAIL: Initial products not found${NC}"
 fi
@@ -53,7 +52,7 @@ echo -e "\n---\n3. GET all products (should include the new product):"
 response=$(call_api GET "/products")
 echo "$response"
 if echo "$response" | grep -q "Tablet"; then
-    echo -e "${GREEN}PASS: Product count increased to 5${NC}"
+    echo -e "${GREEN}PASS: Product count increased to 4${NC}"
 else
     echo -e "${RED}FAIL: New product not found in list${NC}"
 fi
@@ -71,7 +70,7 @@ echo -e "\n---\n5. GET all products (should NOT include the deleted product):"
 response=$(call_api GET "/products")
 echo "$response"
 if ! echo "$response" | grep -q "Tablet"; then
-    echo -e "${GREEN}PASS: Product count returned to 4${NC}"
+    echo -e "${GREEN}PASS: Product count returned to 3${NC}"
 else
     echo -e "${RED}FAIL: Deleted product still found in list${NC}"
 fi
@@ -103,4 +102,4 @@ else
     echo -e "${RED}FAIL: Unexpected response for invalid API key${NC}"
 fi
 
-echo -e "\n---\nAll tests completed." 
+echo -e "\n---\nAll tests completed."

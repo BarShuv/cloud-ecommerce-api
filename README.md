@@ -4,17 +4,43 @@
 
 A simplified cloud-native e-commerce platform focusing on RESTful API Backend and Database components, deployed on AWS.
 
-## Architecture Overview
+## Focus Areas
 
-The solution implements two main components from the requirements:
+This project focuses on two key components from the requirements:
 1. **RESTful API Backend**: A Flask-based API service containerized with Docker
 2. **Database**: MongoDB for product data storage
+
+These components were chosen because they form the core foundation of any e-commerce platform, allowing for product management and data persistence.
+
+## Architecture Overview
+
+### Components
+- **RESTful API Backend**: Handles product management operations
+- **Database**: Stores product data in MongoDB
 
 ### Cloud Services Used
 - **AWS EC2**: For hosting the application
 - **Docker**: For containerization of the API and database
 - **MongoDB**: As the database service
 - **GitHub Actions**: For automated deployment
+
+### Architecture Diagram
+```
++------------------+     +------------------+
+|                  |     |                  |
+|  RESTful API     |     |  MongoDB         |
+|  (Flask)         |<--->|  Database        |
+|                  |     |                  |
++------------------+     +------------------+
+        ^
+        |
++------------------+
+|                  |
+|  Docker          |
+|  Container       |
+|                  |
++------------------+
+```
 
 ## Features
 
@@ -53,21 +79,27 @@ The solution implements two main components from the requirements:
 
 ## API Endpoints
 
+### Authentication
+All API requests require an API key. Include the API key in the `X-API-KEY` header:
+```bash
+curl -H "X-API-KEY: your_api_key" http://localhost:5000/products
+```
+
 ### Get All Products
 ```bash
-curl http://localhost:5000/products
+curl -H "X-API-KEY: your_api_key" http://localhost:5000/products
 ```
 
 ### Create a Product
 ```bash
-curl -X POST -H "Content-Type: application/json" \
+curl -X POST -H "Content-Type: application/json" -H "X-API-KEY: your_api_key" \
   -d '{"name":"Product Name","price":99.99,"description":"Product description"}' \
   http://localhost:5000/products
 ```
 
 ### Delete a Product
 ```bash
-curl -X DELETE http://localhost:5000/products/{product_id}
+curl -X DELETE -H "X-API-KEY: your_api_key" http://localhost:5000/products/{product_id}
 ```
 
 ## Deployment
