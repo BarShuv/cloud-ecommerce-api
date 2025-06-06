@@ -1,5 +1,7 @@
 # Cloud E-commerce API
 
+<!-- Test deployment: this line triggers the GitHub Actions workflow -->
+
 A simplified cloud-native e-commerce platform focusing on RESTful API Backend and Database components, deployed on AWS.
 
 ## Architecture Overview

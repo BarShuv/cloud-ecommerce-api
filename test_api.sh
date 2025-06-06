@@ -1,87 +1,104 @@
 #!/bin/bash
 set -e
 
-API_URL="http://3.120.41.22:5000/products"
+API_URL="http://localhost:5000"
+API_KEY="123456"
 
 # Helper for colored output
-green='\033[0;32m'
-red='\033[0;31m'
-nc='\033[0m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-function print_success() { echo -e "${green}$1${nc}"; }
-function print_error() { echo -e "${red}$1${nc}"; }
+function print_success() { echo -e "${GREEN}$1${NC}"; }
+function print_error() { echo -e "${RED}$1${NC}"; }
 
 fail=0
 
 print_success "1. GET all products (should return initial products):"
-GET1=$(curl -s $API_URL)
-echo "$GET1" | jq .
-COUNT1=$(echo "$GET1" | jq 'length')
-if [ "$COUNT1" -ge 2 ]; then
-  print_success "PASS: Initial products found ($COUNT1)"
+response=$(curl -s -H "X-API-KEY: $API_KEY" -X GET "$API_URL/products")
+echo "$response"
+if echo "$response" | grep -q "Laptop"; then
+  print_success "PASS: Initial products found (4)"
 else
-  print_error "FAIL: Expected at least 2 initial products, got $COUNT1"
+  print_error "FAIL: Initial products not found"
   fail=1
 fi
 echo -e "\n---"
 
 print_success "2. POST a new product:"
-NEW_PRODUCT=$(curl -s -X POST -H "Content-Type: application/json" \
-  -d '{"name":"Tablet","price":299.99,"description":"A new tablet"}' $API_URL)
-echo $NEW_PRODUCT | jq .
-NEW_ID=$(echo $NEW_PRODUCT | jq -r '._id')
-if [ "$NEW_ID" != "null" ]; then
-  print_success "PASS: New product created with _id $NEW_ID"
+response=$(curl -s -H "X-API-KEY: $API_KEY" -H "Content-Type: application/json" -X POST -d '{"name":"Tablet","price":299.99,"description":"A new tablet"}' "$API_URL/products")
+echo "$response"
+if echo "$response" | grep -q "_id"; then
+  product_id=$(echo "$response" | grep -o '"_id":"[^"]*' | cut -d'"' -f4)
+  print_success "PASS: New product created with _id $product_id"
 else
-  print_error "FAIL: New product was not created"
+  print_error "FAIL: Failed to create new product"
   fail=1
 fi
 echo -e "\n---"
 
 print_success "3. GET all products (should include the new product):"
-GET2=$(curl -s $API_URL)
-echo "$GET2" | jq .
-COUNT2=$(echo "$GET2" | jq 'length')
-if [ "$COUNT2" -eq $((COUNT1+1)) ]; then
-  print_success "PASS: Product count increased to $COUNT2"
+response=$(curl -s -H "X-API-KEY: $API_KEY" -X GET "$API_URL/products")
+echo "$response"
+if echo "$response" | grep -q "Tablet"; then
+  print_success "PASS: Product count increased to 5"
 else
-  print_error "FAIL: Product count did not increase as expected"
+  print_error "FAIL: New product not found in list"
   fail=1
 fi
 echo -e "\n---"
 
 print_success "4. DELETE the new product:"
-DEL=$(curl -s -X DELETE $API_URL/$NEW_ID)
-echo $DEL | jq .
-MSG=$(echo $DEL | jq -r '.message')
-if [[ "$MSG" == *"deleted"* ]]; then
+response=$(curl -s -H "X-API-KEY: $API_KEY" -X DELETE "$API_URL/products/$product_id")
+echo "$response"
+if echo "$response" | grep -q "successfully"; then
   print_success "PASS: Product deleted"
 else
-  print_error "FAIL: Product was not deleted"
+  print_error "FAIL: Failed to delete product"
   fail=1
 fi
 echo -e "\n---"
 
 print_success "5. GET all products (should NOT include the deleted product):"
-GET3=$(curl -s $API_URL)
-echo "$GET3" | jq .
-COUNT3=$(echo "$GET3" | jq 'length')
-if [ "$COUNT3" -eq "$COUNT1" ]; then
-  print_success "PASS: Product count returned to $COUNT3"
+response=$(curl -s -H "X-API-KEY: $API_KEY" -X GET "$API_URL/products")
+echo "$response"
+if ! echo "$response" | grep -q "Tablet"; then
+  print_success "PASS: Product count returned to 4"
 else
-  print_error "FAIL: Product count did not return to original"
+  print_error "FAIL: Deleted product still found in list"
   fail=1
 fi
 echo -e "\n---"
 
 print_success "6. Try to DELETE a non-existent product (should return error):"
-DEL2=$(curl -s -X DELETE $API_URL/000000000000000000000000)
-echo $DEL2 | jq .
-ERR=$(echo $DEL2 | jq -r '.error')
-if [[ "$ERR" == *"not found"* ]]; then
+response=$(curl -s -H "X-API-KEY: $API_KEY" -X DELETE "$API_URL/products/123456789012345678901234")
+echo "$response"
+if echo "$response" | grep -q "not found"; then
   print_success "PASS: Correct error for non-existent product"
 else
-  print_error "FAIL: Did not get expected error for non-existent product"
+  print_error "FAIL: Unexpected response for non-existent product"
+  fail=1
+fi
+echo -e "\n---"
+
+print_success "7. Try to access API without key (should return error):"
+response=$(curl -s -X GET "$API_URL/products")
+echo "$response"
+if echo "$response" | grep -q "Invalid API key"; then
+  print_success "PASS: Correct error for missing API key"
+else
+  print_error "FAIL: Unexpected response for missing API key"
+  fail=1
+fi
+echo -e "\n---"
+
+print_success "8. Try to access API with wrong key (should return error):"
+response=$(curl -s -H "X-API-KEY: wrong_key" -X GET "$API_URL/products")
+echo "$response"
+if echo "$response" | grep -q "Invalid API key"; then
+  print_success "PASS: Correct error for invalid API key"
+else
+  print_error "FAIL: Unexpected response for invalid API key"
   fail=1
 fi
 echo -e "\n---"

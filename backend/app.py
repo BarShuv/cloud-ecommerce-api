@@ -13,6 +13,18 @@ client = MongoClient(os.getenv('MONGODB_URI', 'mongodb://mongodb:27017/ecommerce
 db = client.ecommerce
 products_collection = db.products
 
+# API Key configuration
+API_KEY = os.getenv("API_KEY", "123456")
+
+def require_api_key(func):
+    def wrapper(*args, **kwargs):
+        key = request.headers.get("X-API-KEY")
+        if key != API_KEY:
+            return jsonify({"error": "Invalid API key"}), 401
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
 # Helper function to convert MongoDB documents to JSON-serializable format
 def convert_to_json_serializable(doc):
     if isinstance(doc, dict):
@@ -39,6 +51,7 @@ def initialize_db():
 initialize_db()
 
 @app.route('/products', methods=['GET'])
+@require_api_key
 def get_products():
     """Get all products from MongoDB"""
     try:
@@ -50,6 +63,7 @@ def get_products():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products', methods=['POST'])
+@require_api_key
 def create_product():
     """Create a new product in MongoDB"""
     try:
@@ -75,6 +89,7 @@ def create_product():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/products/<product_id>', methods=['DELETE'])
+@require_api_key
 def delete_product(product_id):
     """Delete a product from MongoDB by ID"""
     try:
