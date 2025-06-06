@@ -1,132 +1,92 @@
 # Cloud E-commerce API
 
-A simplified cloud-native e-commerce platform focusing on a RESTful API backend and database components, deployed on AWS using infrastructure as code.
+A simplified cloud-native e-commerce platform focusing on RESTful API Backend and Database components, deployed on AWS.
 
 ## Architecture Overview
 
-The solution consists of the following components:
+The solution implements two main components from the requirements:
+1. **RESTful API Backend**: A Flask-based API service containerized with Docker
+2. **Database**: MongoDB for product data storage
 
-1. **RESTful API Backend**
-   - Flask-based REST API
-   - Containerized with Docker
-   - Deployed on AWS EC2
-   - Implements basic CRUD operations for products
+### Cloud Services Used
+- **AWS EC2**: For hosting the application
+- **Docker**: For containerization of the API and database
+- **MongoDB**: As the database service
 
-2. **Database**
-   - Currently using in-memory storage
-   - Ready for future upgrade to MongoDB
+## Features
 
-## Tools & Services Used
-
-- **Flask**: Lightweight Python web framework for the API
-- **Docker**: Containerization for consistent deployment
-- **Terraform**: Infrastructure as Code for AWS resource provisioning
-- **AWS EC2**: Compute service for hosting the API
-- **AWS Security Groups**: Network security for the EC2 instance
+- RESTful API endpoints for product management:
+  - GET /products - List all products
+  - POST /products - Create a new product
+  - DELETE /products/{id} - Delete a product
+- Docker containerization for easy deployment
+- MongoDB integration for data persistence
 
 ## Prerequisites
 
-- AWS Account with configured credentials
-- Terraform installed
-- Docker installed (for local testing)
-- Python 3.11+
+- Docker and Docker Compose
+- Python 3.9+
+- MongoDB (included in Docker setup)
 
-## Setup Instructions
+## Quick Start
 
-### Local Development
-
-1. Navigate to the backend directory:
+1. Clone the repository:
    ```bash
-   cd backend
+   git clone https://github.com/BarShuv/cloud-ecommerce-api.git
+   cd cloud-ecommerce-api
    ```
 
-2. Create a virtual environment and install dependencies:
+2. Start the application:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+   docker-compose up -d
    ```
 
-3. Run the Flask application:
+3. Test the API:
    ```bash
-   python app.py
-   ```
-
-### Docker Deployment
-
-1. Build the Docker image:
-   ```bash
-   cd backend
-   docker build -t ecommerce-api .
-   ```
-
-2. Run the container:
-   ```bash
-   docker run -p 5000:5000 ecommerce-api
-   ```
-
-### AWS Deployment
-
-1. Configure AWS credentials:
-   ```bash
-   aws configure
-   ```
-
-2. Initialize Terraform:
-   ```bash
-   cd terraform
-   terraform init
-   ```
-
-3. Apply the Terraform configuration:
-   ```bash
-   terraform apply
-   ```
-
-4. SSH into the EC2 instance and deploy the Docker container:
-   ```bash
-   ssh ubuntu@<EC2_PUBLIC_IP>
-   docker run -d -p 5000:5000 ecommerce-api
+   bash test_api.sh
    ```
 
 ## API Endpoints
 
-- `GET /products`: Retrieve all products
-- `POST /products`: Create a new product
-- `DELETE /products/{id}`: Delete a product by ID
-
-Example POST request:
+### Get All Products
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"name":"New Product","price":99.99,"description":"A new product"}' http://localhost:5000/products
+curl http://localhost:5000/products
 ```
+
+### Create a Product
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"name":"Product Name","price":99.99,"description":"Product description"}' \
+  http://localhost:5000/products
+```
+
+### Delete a Product
+```bash
+curl -X DELETE http://localhost:5000/products/{product_id}
+```
+
+## Deployment
+
+The application is deployed on AWS EC2 using Docker containers. The deployment process includes:
+1. Setting up an EC2 instance
+2. Installing Docker and Docker Compose
+3. Cloning the repository
+4. Running the application with docker-compose
 
 ## Future Improvements
 
-1. **Database Integration**
-   - Implement MongoDB for persistent storage
-   - Add database migration scripts
-
-2. **Authentication**
-   - Add JWT-based authentication
-   - Integrate with AWS Cognito
-
-3. **Monitoring & Logging**
-   - Implement CloudWatch integration
-   - Add structured logging
-
-4. **CI/CD Pipeline**
-   - Set up GitHub Actions for automated testing and deployment
-   - Implement blue-green deployment strategy
-
-## Security Considerations
-
-- The current setup uses basic security groups
-- In production, consider:
-  - Restricting SSH access to specific IP ranges
-  - Implementing HTTPS
-  - Adding rate limiting
-  - Setting up AWS WAF
+If given more time, I would implement:
+1. Authentication service integration
+2. Web Front End with React/Vue.js
+3. Real-time data processing for inventory updates
+4. Enhanced security measures
+5. Load balancing and auto-scaling
+6. Monitoring and logging solutions
 
 ## License
 
-MIT 
+MIT License
+
+## Contact
+
+For any questions or issues, please open an issue in the GitHub repository. 
