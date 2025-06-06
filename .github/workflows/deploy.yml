@@ -26,7 +26,8 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh ec2 'if [ ! -d ~/cloud-ecommerce-api ]; then \
+          ssh ec2 'if [ ! -d ~/cloud-ecommerce-api/.git ]; then \
+            rm -rf ~/cloud-ecommerce-api && \
             git clone https://github.com/BarShuv/cloud-ecommerce-api.git ~/cloud-ecommerce-api; \
           fi && \
           cd ~/cloud-ecommerce-api && \
