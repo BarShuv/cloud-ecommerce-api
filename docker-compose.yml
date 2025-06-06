@@ -1,0 +1,27 @@
+# Docker Compose configuration for the e-commerce API with MongoDB
+# This file defines two services: the Flask API and MongoDB database
+
+version: '3.8'  
+
+services:
+  # Flask API Service
+  api:
+    build: ./backend  # Build the API from the Dockerfile in the backend directory
+    ports:
+      - "5000:5000"  # Maps container port 5000 to host port 5000
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/ecommerce  # MongoDB connection string
+    depends_on:
+      - mongodb  # Ensure MongoDB starts before the API
+
+  # MongoDB Service
+  mongodb:
+    image: mongo:latest  # Use the official MongoDB image
+    ports:
+      - "27017:27017"  # Map MongoDB port to host
+    volumes:
+      - mongodb_data:/data/db  # Persist database data
+
+# Define named volumes for data persistence
+volumes:
+  mongodb_data:  # This volume will persist MongoDB data between container restarts 

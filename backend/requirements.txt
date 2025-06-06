@@ -1,0 +1,12 @@
+flask==3.0.2
+flask-cors==4.0.0
+gunicorn==21.2.0
+pymongo==4.6.1  # MongoDB Python driver
+fastapi==0.68.1
+uvicorn==0.15.0
+sqlalchemy==1.4.23
+psycopg2-binary==2.9.1
+redis==3.5.3
+python-jose==3.3.0
+passlib==1.7.4
+python-multipart==0.0.5 
